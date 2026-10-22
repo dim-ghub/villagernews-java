@@ -1,0 +1,151 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'maven-publish'
+}
+
+repositories {
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "TerraformersMC"
+				url = "https://maven.terraformersmc.com/releases/"
+			}
+		}
+		filter {
+			includeGroup "com.terraformersmc"
+		}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	compileOnly "maven.modrinth:4I1XuqiY:${project.emf_version}"
+	compileOnly "maven.modrinth:BVzZfTc1:${project.etf_version}"
+	compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+}
+
+// The mod's textures, models, voice clips and dialogue are generated from the
+// original Bedrock add-on, which is not distributed with this repository.
+// Point the build at your own copy with -Paddon=<path>, VNAP_ADDON=<path>, or
+// by placing the .mcaddon in the addon/ directory.
+def addonArchive = providers.gradleProperty("addon")
+	.orElse(providers.environmentVariable("VNAP_ADDON"))
+	.map { file(it) }
+	.orElse(provider { fileTree("addon") { include "*.mcaddon" }.files.sort().find() })
+def addonSource = layout.buildDirectory.dir("bedrock-source")
+def addonResources = layout.buildDirectory.dir("generated/addon-resources")
+def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+
+def requireAddonArchive = {
+	def archive = addonArchive.getOrNull()
+	if (archive == null || !archive.isFile()) {
+		throw new GradleException("""Villager News add-on not found${archive == null ? "" : " at ${archive}"}.
+This port needs your own copy of the original "Villager News 1.0 Add-On" .mcaddon to build.
+Pass -Paddon=/path/to/addon.mcaddon, set VNAP_ADDON, or place the file in ${file("addon")}.""")
+	}
+	archive
+}
+
+tasks.register("extractAddon", Sync) {
+	group = "addon"
+	description = "Extracts the user-supplied Villager News .mcaddon."
+	inputs.file(addonArchive).optional()
+	from { zipTree(requireAddonArchive()) }
+	into addonSource
+	doFirst {
+		def expected = project.findProperty("addon_sha256")?.toString()
+		def actual = requireAddonArchive().withInputStream { stream ->
+			def digest = java.security.MessageDigest.getInstance("SHA-256")
+			byte[] buffer = new byte[65536]
+			for (int read; (read = stream.read(buffer)) > 0;) digest.update(buffer, 0, read)
+			digest.digest().encodeHex().toString()
+		}
+		if (expected && actual != expected) {
+			logger.warn("Warning: the add-on's SHA-256 is ${actual}, expected ${expected}. A different version may not port correctly.")
+		}
+	}
+}
+
+tasks.register("installAddonTools", Exec) {
+	group = "addon"
+	description = "Installs the Node.js dependencies of the asset porting tools."
+	inputs.files("package.json", "package-lock.json")
+	outputs.dir("node_modules")
+	commandLine(isWindows ? "npm.cmd" : "npm", "ci", "--ignore-scripts", "--no-audit", "--no-fund")
+}
+
+tasks.register("generateAddonResources", Exec) {
+	group = "addon"
+	description = "Converts the extracted Bedrock add-on into Java Edition resources."
+	dependsOn "extractAddon", "installAddonTools"
+	inputs.dir(addonSource)
+	inputs.dir("tools")
+	inputs.dir("src/main/lang")
+	outputs.dir(addonResources)
+	environment "VNAP_ADDON_SOURCE", addonSource.get().asFile.absolutePath
+	environment "VNAP_GENERATED_RESOURCES", addonResources.get().asFile.absolutePath
+	commandLine "node", "tools/port-addon.mjs"
+}
+
+sourceSets.main.resources.srcDir(files(addonResources).builtBy("generateAddonResources"))
+
+processResources {
+	def version = project.version
+	def dialogueTestCommand = project.findProperty("dialogue_test_command")?.toString()?.toBoolean() ?: false
+	inputs.property "version", version
+	inputs.property "dialogue_test_command", dialogueTestCommand
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+
+	filesMatching("villager-news-addon-port-build.properties") {
+		expand "dialogue_test_command": dialogueTestCommand
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+jar {
+	def projectName = project.name
+	inputs.property "projectName", projectName
+
+	from("LICENSE") {
+		rename { "${it}_$projectName"}
+	}
+}
+
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+	}
+}

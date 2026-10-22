@@ -1,0 +1,13 @@
+{
+  "name": "villager-news-addon-port-tools",
+  "private": true,
+  "description": "Tools that generate the mod's assets from a user-supplied copy of the Villager News add-on.",
+  "type": "module",
+  "scripts": {
+    "port": "node tools/port-addon.mjs",
+    "verify": "node tools/verify-port.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

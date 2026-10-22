@@ -1,6 +1,6 @@
 # Villager News Addon Port
 
-A Fabric port of the **Villager News Add-On** for Minecraft Java Edition 26.2.
+A Fabric port of the **Villager News Add-On** for Minecraft Java Edition 26.3.
 It brings the original Villager News characters, models, animations, textures,
 voice acting, and contextual dialogue to Java Edition while retaining normal
 Minecraft villager gameplay.
@@ -32,11 +32,11 @@ Minecraft villager gameplay.
 
 ## Requirements
 
-- Minecraft Java Edition 26.2
+- Minecraft Java Edition 26.3
 - Fabric Loader 0.19.5 or newer
-- Fabric API for Minecraft 26.2
-- Entity Model Features 3.3.5 or newer
-- Entity Texture Features 7.2.1 or newer
+- Fabric API for Minecraft 26.3
+- Entity Model Features 3.3.10 or newer
+- Entity Texture Features 7.2.5 or newer
 - Entity Sound Features 0.8.2 or newer
 
 EMF, ETF, and ESF are external dependencies. This project does not bundle or
@@ -53,7 +53,7 @@ add-on and must build the mod yourself; see
 [Building from source](#building-from-source).
 
 1. Build the mod jar as described below.
-2. Install Fabric Loader for Minecraft 26.2.
+2. Install Fabric Loader for Minecraft 26.3.
 3. Download Fabric API, EMF, ETF, and ESF for the same Minecraft version.
 4. Put the dependency jars and your built
    `build/libs/villager-news-addon-port-<version>.jar` (not the `-sources`

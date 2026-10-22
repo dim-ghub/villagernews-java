@@ -856,7 +856,7 @@ public final class ContextualDialogueController {
 			double x = villager.getX() + Math.cos(angle) * distance;
 			double y = villager.getY() + villager.getRandom().nextInt(11) - 5;
 			double z = villager.getZ() + Math.sin(angle) * distance;
-			if (villager.randomTeleport(x, y, z, true)) {
+			if (villager.randomTeleport(x, y, z, true, state -> false)) {
 				villager.getNavigation().stop();
 				return true;
 			}

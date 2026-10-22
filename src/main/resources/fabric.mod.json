@@ -32,11 +32,11 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.19.5",
-		"minecraft": "~26.2",
+		"minecraft": "~26.3",
 		"java": ">=25",
 		"fabric-api": "*",
-		"entity_model_features": ">=3.3.5",
-		"entity_texture_features": ">=7.2.1",
+		"entity_model_features": ">=3.3.10",
+		"entity_texture_features": ">=7.2.5",
 		"entity_sound_features": ">=0.8.2"
 	}
 }

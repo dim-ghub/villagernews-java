@@ -42,6 +42,16 @@ Minecraft villager gameplay.
 EMF, ETF, and ESF are external dependencies. This project does not bundle or
 modify them.
 
+### Fresh Animations compatibility
+
+Resource packs such as Fresh Animations replace villager models and textures,
+which hides the Villager News characters. Turn on **Fresh Animations
+Compatibility** in the Villager News settings (handbook or Mod Menu) to keep
+this mod's models, textures, and sounds above every other resource pack. When
+enabled, a fixed "Villager News Priority" pack is added to the top of the
+resource pack list; turning the setting off removes it again. The setting is
+stored per client in `config/villager-news-addon-port-client.json`.
+
 Mod Menu is optional. When installed, its Configure button opens the Villager
 News settings directly. Without Mod Menu, the same settings remain available
 in the Villager News Handbook.
@@ -235,6 +245,13 @@ the add-on this port is based on. All of the characters, voice acting,
 models, textures, animations, and writing are their work. This project only
 converts it to run on Java Edition, which is why it requires your own
 purchased copy of the add-on instead of shipping any of it. If you enjoy this
-port, please support them by buying the original add-on. The converted models, textures,
-animations, and audio remain the property of their respective owners. See
-[`LICENSE`](LICENSE) for repository licensing details.
+port, please support them by buying the original add-on.
+
+The Java Edition port itself was created by **marcy**, who wrote the original
+Fabric mod and the tools that convert the add-on's models, textures,
+animations, and dialogue. Thank you for all of the work that made this port
+possible.
+
+The converted models, textures, animations, and audio remain the property of
+their respective owners. See [`LICENSE`](LICENSE) for repository licensing
+details.

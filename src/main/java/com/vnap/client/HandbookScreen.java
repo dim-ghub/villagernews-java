@@ -254,6 +254,14 @@ public final class HandbookScreen extends Screen {
 		spawnSpecialVillagers.active = canEdit;
 		addRenderableWidget(spawnSpecialVillagers);
 		y += 26;
+		Component freshAnimationsLabel = Component.literal("Fresh Animations Compatibility");
+		addText(left, font.width(freshAnimationsLabel) > labelWidth - 6 ? y + 1 : y + 6, labelWidth - 6, freshAnimationsLabel, false);
+		addRenderableWidget(Button.builder(Component.literal(toggleLabel(VillagerNewsClientSettings.freshAnimationsCompatibility())), button -> {
+			boolean enabled = !VillagerNewsClientSettings.freshAnimationsCompatibility();
+			button.setMessage(Component.literal(toggleLabel(enabled)));
+			VillagerNewsPriorityPack.setEnabled(enabled);
+		}).bounds(buttonLeft, y, buttonWidth, 20).build());
+		y += 26;
 		addText(left, y + 6, labelWidth - 6, Component.literal("Villager Style"), false);
 		Button style = Button.builder(Component.literal("Villager News"), button -> {
 		}).bounds(buttonLeft, y, buttonWidth, 20).build();
